@@ -35,3 +35,19 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# ========== BACKEND: PYTHON / FLASK ==========
+# Virtual environment
+venv/
+backend/venv/
+
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Flask environment/config
+.env
+
+# IDE/editor folders
+.vscode/
