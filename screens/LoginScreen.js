@@ -9,21 +9,39 @@ import {
   ImageBackground
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BASE_URL } from '../config';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    try {
-      const fakeToken = 'mocked.jwt.token.abc123';
-      await AsyncStorage.setItem('token', fakeToken);
+const handleLogin = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: email,
+        password: password
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.access_token) {
+      await AsyncStorage.setItem('token', data.access_token);
       Alert.alert('Sukces', 'Zalogowano!');
       navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
-    } catch (error) {
-      Alert.alert('Błąd logowania', 'Coś poszło nie tak.');
+    } else {
+      Alert.alert('Błąd logowania', data.msg || 'Nieprawidłowe dane');
     }
-  };
+  } catch (error) {
+    console.error('Błąd logowania:', error);
+    Alert.alert('Błąd', 'Nie udało się połączyć z serwerem.');
+  }
+};
 
   return (
     <ImageBackground
@@ -58,10 +76,19 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Zaloguj się</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={{ textAlign: 'center', marginTop: 16, color: '#007aff' }}>
+             Nie masz konta? Zarejestruj się
+          </Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   background: {
