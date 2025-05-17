@@ -36,11 +36,15 @@ def create_reservation():
 def get_reservations():
     user_id = get_jwt_identity()
     reservations = Reservation.query.filter_by(user_id=user_id).all()
-    return jsonify([
-        {
+    result = []
+    for r in reservations:
+        restaurant = Restaurant.query.get(r.restaurant_id)
+        result.append({
             "id": r.id,
             "restaurant_id": r.restaurant_id,
+            "restaurant_name": restaurant.name if restaurant else f"Restauracja {r.restaurant_id}",
             "reservation_time": r.reservation_time,
             "number_of_people": r.number_of_people
-        } for r in reservations
-    ]), 200
+        })
+    return jsonify(result), 200
+

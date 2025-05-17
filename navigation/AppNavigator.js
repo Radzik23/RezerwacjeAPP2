@@ -6,6 +6,8 @@ import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ReservationsScreen from '../screens/ReservationsScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import CreateReservationScreen from '../screens/CreateReservationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +19,8 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Reservations" component={ReservationsScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="CreateReservation" component={CreateReservationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
