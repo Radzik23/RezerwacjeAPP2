@@ -14,31 +14,40 @@ export default function ProfileScreen({ navigation }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
+  try {
+    const token = await AsyncStorage.getItem('token');
+    console.log("Token JWT:", token);
 
-        const response = await fetch(`${BASE_URL}/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+    if (!token) {
+      Alert.alert('Błąd', 'Brak tokenu – zaloguj się ponownie');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      });
+      return;
+    }
 
-        const responseText = await response.text();
-
-
-        if (!response.ok) {
-          throw new Error(`Błąd serwera: ${response.status}`);
-        }
-
-        const data = JSON.parse(responseText);
-        setUser(data);
-
-      } catch (error) {
-        console.error('Błąd pobierania profilu:', error);
-        console.log('❌ Błąd pobierania profilu:', error);
-        Alert.alert('Błąd', 'Nie udało się pobrać danych użytkownika');
+    const response = await fetch(`${BASE_URL}/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    };
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      throw new Error(`Błąd serwera: ${response.status}`);
+    }
+
+    const data = JSON.parse(responseText);
+    setUser(data);
+
+  } catch (error) {
+    console.error('❌ Błąd pobierania profilu:', error);
+    Alert.alert('Błąd', 'Nie udało się pobrać danych użytkownika');
+  }
+};
+
 
     fetchUser();
   }, []);

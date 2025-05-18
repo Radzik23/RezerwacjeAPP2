@@ -6,16 +6,40 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity
+  TouchableOpacity,
+  Button
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../config';
 import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import dayjs from 'dayjs'
+
 
 export default function ReservationsScreen() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+
+  const handleDelete = async (id) => {
+  const token = await AsyncStorage.getItem('token');
+  try {
+    const response = await fetch(`${BASE_URL}/reservations/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.ok) {
+      Alert.alert('Sukces', 'Rezerwacja usunięta');
+      fetchReservations(); // odświeżenie listy
+    } else {
+      Alert.alert('Błąd', 'Nie udało się usunąć rezerwacji');
+    }
+  } catch (error) {
+    Alert.alert('Błąd', 'Wystąpił błąd sieci');
+  }
+};
+
 
   const fetchReservations = async () => {
     try {
@@ -44,15 +68,44 @@ export default function ReservationsScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchReservations();
+    }, [])
+  );
+
+const [restaurants, setRestaurants] = useState([]);
+
+useEffect(() => {
+  fetchRestaurants();
+}, []);
+
+const getRestaurantName = (id) => {
+  const restaurant = restaurants.find(r => r.id === id);
+  return restaurant ? restaurant.name : 'Nieznana restauracja';
+};
+
+
+const fetchRestaurants = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/restaurants`);
+    const data = await response.json();
+    setRestaurants(data);
+  } catch (error) {
+    console.error('Błąd ładowania restauracji:', error);
+  }
+};
+
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <Text style={styles.title}>Restauracja : {item.restaurant_name}</Text>
-      <Text>Godzina: {item.reservation_time}</Text>
+      <Text>Restauracja: {getRestaurantName(item.restaurant_id)}</Text>
+      <Text>Godzina: {dayjs(item.reservation_time).format('DD.MM.YYYY HH:mm')}</Text>
       <Text>Liczba osób: {item.number_of_people}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+        <Button title="Edytuj" onPress={() => navigation.navigate('EditReservation', { reservation: item })} />
+        <Button title="Usuń" color="red" onPress={() => handleDelete(item.id)} />
+      </View>
     </View>
   );
 

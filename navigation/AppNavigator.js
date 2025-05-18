@@ -8,6 +8,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ReservationsScreen from '../screens/ReservationsScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import CreateReservationScreen from '../screens/CreateReservationScreen';
+import EditReservationScreen from '../screens/EditReservationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Reservations" component={ReservationsScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="CreateReservation" component={CreateReservationScreen} />
+        <Stack.Screen name="EditReservation" component={EditReservationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
