@@ -44,3 +44,33 @@ def get_reservations():
             "number_of_people": r.number_of_people
         } for r in reservations
     ]), 200
+
+@reservations_bp.route('/reservations/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_reservation(id):
+    user_id = get_jwt_identity()
+    reservation = Reservation.query.filter_by(id=id, user_id=user_id).first()
+
+    if not reservation:
+        return jsonify({"msg": "Reservation not found"}), 404
+
+    data = request.get_json()
+    reservation.reservation_time = data.get('reservation_time', reservation.reservation_time)
+    reservation.number_of_people = data.get('number_of_people', reservation.number_of_people)
+
+    db.session.commit()
+    return jsonify({"msg": "Reservation updated"}), 200
+
+@reservations_bp.route('/reservations/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_reservation(id):
+    user_id = get_jwt_identity()
+    reservation = Reservation.query.filter_by(id=id, user_id=user_id).first()
+
+    if not reservation:
+        return jsonify({"msg": "Reservation not found"}), 404
+
+    db.session.delete(reservation)
+    db.session.commit()
+    return jsonify({"msg": "Reservation deleted"}), 200
+
